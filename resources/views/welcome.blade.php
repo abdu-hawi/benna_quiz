@@ -50,7 +50,7 @@
                                     </div>
                                 @else
                                     <center>
-                                        <h1>المسابقة الرمضانية الإثنينية</h1>
+                                        <h1>المسابقة الرمضانية</h1>
                                         <h4>الإسبوع {{ $questions[0]["week_number"] }}</h4>
                                     </center>
                                     @include('admin.layouts.massages')

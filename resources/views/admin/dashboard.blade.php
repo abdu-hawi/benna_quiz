@@ -53,9 +53,10 @@
                                         <div class="icon">
                                             <i class="fa fa-users"></i>
                                         </div>
-                                        <a class="small-box-footer" {!! $q["url"] ? 'style="cursor: pointer" onclick="getPlayer('.$i.')"' : '' !!}>
+                                        <a class="small-box-footer" {!! $q["url"] ? 'style="cursor: pointer" onclick="getPlayer('.$i.')"' : '' !!}
+                                                    {!! $q["win"] ? 'style="cursor: pointer" onclick="getWinner('.$i.')"' : '' !!}>
                                             {{ $q["txt_show_player"] }}
-                                            {!! $q["url"] ? '<i class="fas fa-arrow-circle-left"></i>':'' !!}
+                                            {!! $q["url"] || $q["win"] ? '<i class="fas fa-arrow-circle-left"></i>':'' !!}
                                         </a>
                                     </div>
                                 </div>
@@ -67,6 +68,35 @@
                     </div>
 
                 </div>
+                <div class="row" id="table-user">
+                    <div class="col-lg-12">
+                        <center class="m-2 mb-4">
+                            <h3>الاسبوع <span id="week-span">1</span></h3>
+                        </center>
+                        <table class="table">
+{{--                            <thead>--}}
+{{--                            <tr>--}}
+{{--                                <th scope="col">#</th>--}}
+{{--                                <th scope="col">الاسم</th>--}}
+{{--                            </tr>--}}
+{{--                            </thead>--}}
+{{--                            <tbody>--}}
+{{--                            <tr>--}}
+{{--                                <th scope="row">1</th>--}}
+{{--                                <td>Mark</td>--}}
+{{--                            </tr>--}}
+{{--                            <tr>--}}
+{{--                                <th scope="row">2</th>--}}
+{{--                                <td>Jacob</td>--}}
+{{--                            </tr>--}}
+{{--                            <tr>--}}
+{{--                                <th scope="row">3</th>--}}
+{{--                                <td>Larry</td>--}}
+{{--                            </tr>--}}
+{{--                            </tbody>--}}
+                        </table>
+                    </div>
+                </div>
                 <!-- /.row -->
             </div><!-- /.container-fluid -->
         </div>
@@ -76,14 +106,56 @@
     @push('scripts')
 
         <script>
+            var t = $('#table-user')
+            t.hide()
             function getPlayer(week){
+                t.hide()
+                t.find('thead').remove()
+                t.find('tbody').remove()
+                $("#week-span").html(week)
                 $.ajax({
                     url:'{!! route("home.ajax") !!}',
                     type:'get',
                     data_type:'json',
-                    data: {_token:'{!! csrf_token() !!}', week_number: week},
+                    data: {_token:'{!! csrf_token() !!}', week_number: week, isWinner: 'isWinner'},
+                    success:function (data) {
+                        var txt = '<thead><tr><th scope="col">#</th><th scope="col">الاسم</th><th scope="col">رقم الهوية</th></tr></thead><tbody>'
+                        for (let i = 0; i < data.length; i++){
+                            txt += '<tr><th scope="row">'+(i+1)+'</th><td>'+data[i].name+'</td><td>'+data[i].national_id+'</td></tr>'
+                        }
+                        txt += '</tbody>'
+                        $('.table').append(txt)
+                        t.show()
+                    },
+                    error:function (){
+                        alert("لم يتم الارسال نرجوا المحاولة مرة أخرى")
+                    }
+                })
+                return false
+            }
+            function getWinner(week){
+                t.hide()
+                t.find('thead').remove()
+                t.find('tbody').remove()
+                $("#week-span").html(week);
+                getData(week, null)
+            }
+
+            function getData(week, isWinner){
+                $.ajax({
+                    url:'{!! route("home.ajax") !!}',
+                    type:'get',
+                    data_type:'json',
+                    data: {_token:'{!! csrf_token() !!}', week_number: week, isWinner: isWinner},
                     success:function (data) {
                         console.log(data)
+                        var txt = '<thead><tr><th scope="col">#</th><th scope="col">الاسم</th><th scope="col">رقم الهوية</th>th scope="col">عدد الأجوبة الصحيحة</th><th scope="col">حذف</th></tr></thead><tbody>'
+                        for (let i = 0; i < data.length; i++){
+                            txt += '<tr><th scope="row">'+(i+1)+'</th><td>'+data[i].name+'</td><td>'+data[i].national_id+'</td><td>'+data[i].correct+'</td><td><button style="background-color: #ff253a">حذف</button></td></tr>'
+                        }
+                        txt += '</tbody>'
+                        $('.table').append(txt)
+                        t.show()
                     },
                     error:function (){
                         alert("لم يتم الارسال نرجوا المحاولة مرة أخرى")

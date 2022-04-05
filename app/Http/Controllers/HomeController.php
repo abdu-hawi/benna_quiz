@@ -39,21 +39,25 @@ class HomeController extends Controller
                 $box_title = "عدد المتسابقين";
                 $volunteer = isset($v[$i]) ? count($v[$i]) : 0;
                 $url = true;
+                $win = false;
                 $txt_show_player = "تم تسليم الجوائز";
             } elseif($q[$i]->publish_date == $date){ // allow get won
                 $box_title = "عدد المتسابقين";
                 $volunteer = isset($v[$i]) ? count($v[$i]) : 0;
-                $url = true;
+                $url = false;
+                $win = true;
                 $txt_show_player = "إعمل قرعة بين الفائزين";
             } elseif($q[$i]->publish_date == Carbon::now()->toDateString()){
                 $box_title = "عدد المتسابقين";
                 $volunteer = isset($v[$i]) ? count($v[$i]) : 0;
                 $url = false;
+                $win = false;
                 $txt_show_player = "وقت تسليم الأجوبة لم ينتهي";
             }else{
                 $box_title = "تاريخ المسابقة";
                 $volunteer = $q[5]->publish_date;
                 $url = false;
+                $win = false;
                 $txt_show_player = "لم تبدأ المسابقة";
             }
             $qa[$i]['week_number'] = $q[5]->week_number;
@@ -61,12 +65,42 @@ class HomeController extends Controller
             $qa[$i]['box_subtitle'] = $volunteer;
             $qa[$i]['url'] = $url;
             $qa[$i]['txt_show_player'] = $txt_show_player;
+            $qa[$i]['win'] = $win;
         }
         return view('admin.dashboard', ['quiz'=>$qa]);
     }
 
     public function get_player(Request $request){
-        return $request->week_number;
+        if( $request->isWinner == 'isWinner' )
+            return Volunteer::query()->where('is_win', true)->where('week_number',$request->week_number)->limit(7)->get()->toArray();
+        else {
+            $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',7)->orderBy('correct','desc')->get()->toArray();
+            $clearWin = [];
+            foreach ($v as $vv){
+                $checkWin = Volunteer::query()->where('id',$vv["id"])->where('is_win', true)->get();
+                if (count($checkWin) == 0){
+                    array_push($clearWin, $checkWin);
+                }
+            }
+            if (count($clearWin) > 7){
+                shuffle($clearWin);
+                return array_slice($clearWin,0,7);
+            }else{
+                $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',6)->orderBy('correct','desc')->get()->toArray();
+                $clearWin6 =[];
+                foreach ($v as $vv){
+                    $checkWin6 = Volunteer::query()->where('id',$vv["id"])->where('is_win', true)->get();
+                    if (count($checkWin6) == 0){
+                        array_push($clearWin6, $checkWin6);
+                    }
+                }
+            }
+
+
+            shuffle($clearWin);
+            $arr =  array_slice($clearWin,0,7);
+            return $v;
+        }
     }
 
     public function question(){
