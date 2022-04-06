@@ -149,9 +149,10 @@
                     data: {_token:'{!! csrf_token() !!}', week_number: week, isWinner: isWinner},
                     success:function (data) {
                         console.log(data)
-                        var txt = '<thead><tr><th scope="col">#</th><th scope="col">الاسم</th><th scope="col">رقم الهوية</th>th scope="col">عدد الأجوبة الصحيحة</th><th scope="col">حذف</th></tr></thead><tbody>'
+                        var txt = '<thead><tr><th scope="col">#</th><th scope="col">الاسم</th><th scope="col">رقم الهوية</th><th scope="col" class="text-center">عدد الأجوبة الصحيحة</th></tr></thead><tbody>'
                         for (let i = 0; i < data.length; i++){
-                            txt += '<tr><th scope="row">'+(i+1)+'</th><td>'+data[i].name+'</td><td>'+data[i].national_id+'</td><td>'+data[i].correct+'</td><td><button style="background-color: #ff253a">حذف</button></td></tr>'
+                            txt += '<tr><th scope="row">'+(i+1)+'</th><td>'+data[i].name+'</td><td>'+data[i].national_id+'</td><td class="text-center">'+data[i].correct+
+                                '</td></tr>'
                         }
                         txt += '</tbody>'
                         $('.table').append(txt)

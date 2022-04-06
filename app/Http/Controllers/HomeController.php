@@ -74,70 +74,110 @@ class HomeController extends Controller
         if( $request->isWinner == 'isWinner' )
             return Volunteer::query()->where('is_win', true)->where('week_number',$request->week_number)->limit(7)->get()->toArray();
         else {
+            $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',7)->orderBy('correct','desc')->get()->toArray();
             $clearWin = [];
-            for ($i=7;$i>0;$i--){
-                $clearWinArr = [];
-                $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',$i)->orderBy('correct','desc')->get()->toArray();
-                foreach ($v as $vv){
-                    $checkWin = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
-                    if (count($checkWin) == 0){
-                        array_push($clearWinArr, $vv);
-                    }
-                }
-                if (count($clearWinArr) > (7 - count($clearWin)) ){
-                    shuffle($clearWinArr);
-                    $clearWinArr =  array_slice($clearWin,0,(7 - count($clearWin)));
+            foreach ($v as $vv){
+                $checkWin = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                if (count($checkWin) == 0){
+                    array_push($clearWin, $vv);
                 }
             }
-//            $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',7)->orderBy('correct','desc')->get()->toArray();
-//            $clearWin = [];
-//            foreach ($v as $vv){
-//                $checkWin = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
-//                if (count($checkWin) == 0){
-//                    array_push($clearWin, $vv);
-//                }
-//            }
-//            if (count($clearWin) > 7){
-//                shuffle($clearWin);
-//                return array_slice($clearWin,0,7);
-//            }
-//            else{
-//                $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',6)->orderBy('correct','desc')->get()->toArray();
-//                $clearWin6 =[];
-//                foreach ($v as $vv){
-//                    $checkWin6 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
-//                    if (count($checkWin6) == 0){
-//                        array_push($clearWin6, $vv);
-//                    }
-//                }
-//                shuffle($clearWin6);
-//                if ($clearWin6 >= (7 - count($clearWin)) ){
-//                    $clearWin6 = array_slice($clearWin6,0,(7 - count($clearWin)) );
-//                    return array_merge($clearWin , $clearWin6);
-//                }else{
-//                    $clearWin = array_merge($clearWin , $clearWin6);
-//                    $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',5)->orderBy('correct','desc')->get()->toArray();
-//                    $clearWin5 =[];
-//                    foreach ($v as $vv){
-//                        $checkWin5 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
-//                        if (count($checkWin5) == 0){
-//                            array_push($clearWin5, $vv);
-//                        }
-//                    }
-//                    shuffle($clearWin5);
-//                    if ($clearWin5 >= (7 - count($clearWin)) ){
-//                        $clearWin5 =  array_slice($clearWin5,0,(7 - count($clearWin)) );
-//                        return array_merge($clearWin , $clearWin5);
-//                    }else{
-//                        $clearWin = $clearWin + $clearWin5;
-//                    }
-//                }
-//            }
-
-
-            shuffle($clearWin);
-            $arr =  array_slice($clearWin,0,7);
-            return $arr;
+            if (count($clearWin) > 7){
+                shuffle($clearWin);
+                return array_slice($clearWin,0,7);
+            }
+            else{
+                $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',6)->orderBy('correct','desc')->get()->toArray();
+                $clearWin6 =[];
+                foreach ($v as $vv){
+                    $checkWin6 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                    if (count($checkWin6) == 0){
+                        array_push($clearWin6, $vv);
+                    }
+                }
+                shuffle($clearWin6);
+                if ($clearWin6 >= (7 - count($clearWin)) ){
+                    $clearWin6 = array_slice($clearWin6,0,(7 - count($clearWin)) );
+                    return array_merge($clearWin , $clearWin6);
+                }else{
+                    $clearWin = array_merge($clearWin , $clearWin6);
+                    $v = Volunteer::query()->where('week_number',$request->week_number)->where('correct',5)->orderBy('correct','desc')->get()->toArray();
+                    $clearWin5 =[];
+                    foreach ($v as $vv){
+                        $checkWin5 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                        if (count($checkWin5) == 0){
+                            array_push($clearWin5, $vv);
+                        }
+                    }
+                    shuffle($clearWin5);
+                    if ($clearWin5 >= (7 - count($clearWin)) ){
+                        $clearWin5 =  array_slice($clearWin5,0,(7 - count($clearWin)) );
+                        return array_merge($clearWin , $clearWin5);
+                    }else{
+                        $clearWin = array_merge($clearWin , $clearWin5);
+                        $v = Volunteer::query()->where('week_number',$request->week_number)
+                            ->where('correct',4)->orderBy('correct','desc')->get()->toArray();
+                        $clearWin4 =[];
+                        foreach ($v as $vv){
+                            $checkWin4 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                            if (count($checkWin4) == 0){
+                                array_push($clearWin4, $vv);
+                            }
+                        }
+                        shuffle($clearWin4);
+                        if ($clearWin4 >= (7 - count($clearWin)) ){
+                            $clearWin4 =  array_slice($clearWin4,0,(7 - count($clearWin)) );
+                            return array_merge($clearWin , $clearWin4);
+                        }else{
+                            $clearWin = array_merge($clearWin , $clearWin4);
+                            $v = Volunteer::query()->where('week_number',$request->week_number)
+                                ->where('correct',3)->orderBy('correct','desc')->get()->toArray();
+                            $clearWin3 =[];
+                            foreach ($v as $vv){
+                                $checkWin3 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                                if (count($checkWin3) == 0){
+                                    array_push($clearWin3, $vv);
+                                }
+                            }
+                            shuffle($clearWin3);
+                            if ($clearWin3 >= (7 - count($clearWin)) ){
+                                $clearWin3 =  array_slice($clearWin3,0,(7 - count($clearWin)) );
+                                return array_merge($clearWin , $clearWin3);
+                            }else{
+                                $clearWin = array_merge($clearWin , $clearWin3);
+                                $v = Volunteer::query()->where('week_number',$request->week_number)
+                                    ->where('correct',2)->orderBy('correct','desc')->get()->toArray();
+                                $clearWin2 =[];
+                                foreach ($v as $vv){
+                                    $checkWin2 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                                    if (count($checkWin2) == 0){
+                                        array_push($clearWin2, $vv);
+                                    }
+                                }
+                                shuffle($clearWin2);
+                                if ($clearWin2 >= (7 - count($clearWin)) ){
+                                    $clearWin2 =  array_slice($clearWin2,0,(7 - count($clearWin)) );
+                                    return array_merge($clearWin , $clearWin2);
+                                }else{
+                                    $clearWin = array_merge($clearWin , $clearWin2);
+                                    $v = Volunteer::query()->where('week_number',$request->week_number)
+                                        ->where('correct',1)->orderBy('correct','desc')->get()->toArray();
+                                    $clearWin1 =[];
+                                    foreach ($v as $vv){
+                                        $checkWin1 = Volunteer::query()->where('national_id',$vv["national_id"])->where('is_win', true)->get();
+                                        if (count($checkWin1) == 0){
+                                            array_push($clearWin2, $vv);
+                                        }
+                                    }
+                                    shuffle($clearWin1);
+                                    $clearWin1 =  array_slice($clearWin1,0,(7 - count($clearWin)) );
+                                    return array_merge($clearWin , $clearWin1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
